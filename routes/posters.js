@@ -8,7 +8,7 @@ const {Poster} = require("../models")
 // Import forms
 const {createPosterForm, bootstrapField}=require("../forms")
 
-
+// READ
 router.get("/", async(req,res)=>{
     let posters = await Poster.collection().fetch();
     res.render("posters/index",{
@@ -16,6 +16,9 @@ router.get("/", async(req,res)=>{
     })
 })
 
+
+// CREATE
+// GET
 router.get("/create", (req,res)=>{
     const posterForm = createPosterForm();
     res.render("posters/create",{
@@ -23,6 +26,7 @@ router.get("/create", (req,res)=>{
     })
 })
 
+// POST
 router.post("/create", (req,res)=>{
     const posterForm = createPosterForm();
     posterForm.handle(req,{
@@ -46,5 +50,8 @@ router.post("/create", (req,res)=>{
     })
 })
 
+
+// DELETE
+router.get(")
 
 module.exports = router
