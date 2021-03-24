@@ -11,6 +11,17 @@
     <title>{{#block "title"}}{{/block}}</title>
   </head>
   <body>
+      {{#if success_msg}}
+        {{#each success_msg}}
+            <div class="alert alert-success">{{this}}</div>
+        {{/each}}
+      {{/if}}
+
+      {{#if error_msg}}
+        {{#each error_msg}}
+            <div class="alert alert-danger">{{this}}</div>
+        {{/each}}
+      {{/if}}
       <section class="container">
           {{#block "content"}}
         {{/block}}
