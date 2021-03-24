@@ -2,6 +2,7 @@ const forms = require("forms")
 
 const fields = forms.fields;
 const validators = forms.validators;
+const widget = forms.widgets;
 
 
 var bootstrapField = function (name, object) {
@@ -54,7 +55,8 @@ const createPosterForm = () => {
             errorAfterField: true,
             cssClass:{
                 label: ["form-label"]
-            }
+            },
+            widget: widget.date(),
         }),
         "stock": fields.string({
             required: true,

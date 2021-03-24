@@ -50,8 +50,81 @@ router.post("/create", (req,res)=>{
     })
 })
 
+// UPDATE
+router.get("/:poster_id/update", async (req,res)=>{
+    // Get the poster that you want to update
+    const posterToUpdate = await Poster.where({
+        "id": req.params.poster_id
+    }).fetch({
+        required: true
+    })
+    
+    const posterJSON = posterToUpdate.toJSON()
+    // send the poster to the view
+    const form = createPosterForm();
+    form.fields.title.value = posterToUpdate.get("title");
+    form.fields.cost.value = posterToUpdate.get("cost");
+    form.fields.description.value = posterToUpdate.get("description");
+    form.fields.date.value = posterToUpdate.get("date");
+    form.fields.stock.value = posterToUpdate.get("stock");
+    form.fields.height.value = posterToUpdate.get("height");
+    form.fields.width.value = posterToUpdate.get("width");
+
+    res.render("posters/update",{
+        "form": form.toHTML(bootstrapField),
+        "poster": posterJSON
+    })
+})
+
+router.post("/:poster_id/update", async(req,res)=>{
+    // Get the poster that you want to update
+    const posterToUpdate = await Poster.where({
+        "id": req.params.poster_id
+    }).fetch({
+        required: true
+    })
+
+    const posterJSON = posterToUpdate.toJSON()
+    const posterForm = createPosterForm();
+
+    posterForm.handle(req,{
+        "success": async(form)=> {
+            posterToUpdate.set(form.data)
+            posterToUpdate.save()
+            res.redirect("/posters")
+        },
+        "error": async(form)=>{
+            res.render("posters/update",{
+                "form" : form.toHTML(bootstrapField)
+            })
+        }
+    })
+})
+
 
 // DELETE
-router.get(")
+router.get("/:poster_id/delete", async (req,res)=>{
+    const posterToDelete = await Poster.where({
+        "id": req.params.poster_id
+    }).fetch({
+        required:true
+    })
+
+    res.render("posters/delete",{
+        "poster": posterToDelete.toJSON()
+    })
+})
+
+router.post("/:poster_id/delete", async(req,res)=>{
+    const posterToDelete = await Poster.where({
+        "id": req.params.poster_id
+    }).fetch({
+        required:true
+    })
+    await posterToDelete.destroy();
+    res.redirect("/posters")
+})
+
+
 
 module.exports = router
