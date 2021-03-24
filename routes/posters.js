@@ -3,7 +3,7 @@ const express = require("express")
 const router = express.Router()
 
 // Import Poster Model
-const { Poster } = require("../models")
+const { Poster, Genres } = require("../models")
 
 // Import forms
 const { createPosterForm, bootstrapField } = require("../forms")
@@ -19,27 +19,38 @@ router.get("/", async (req, res) => {
 
 // CREATE
 // GET
-router.get("/create", (req, res) => {
-    const posterForm = createPosterForm();
+router.get("/create", async(req, res) => {
+    //display all genres
+    const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
+
+    const posterForm = createPosterForm(allGenre);
     res.render("posters/create", {
         "form": posterForm.toHTML(bootstrapField)
     })
 })
 
 // POST
-router.post("/create", (req, res) => {
-    const posterForm = createPosterForm();
+router.post("/create", async (req, res) => {
+    const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
+    
+    const posterForm = createPosterForm(allGenre);
     posterForm.handle(req, {
         "success": async (form) => {
+            let {genre,...posterData} = form.data;
             const newPoster = new Poster();
-            newPoster.set("title", form.data.title)
-            newPoster.set("cost", form.data.cost)
-            newPoster.set("description", form.data.description)
-            newPoster.set("date", form.data.date)
-            newPoster.set("stock", form.data.stock)
-            newPoster.set("height", form.data.height)
-            newPoster.set("width", form.data.width)
+            newPoster.set(posterData);
             await newPoster.save();
+            if (genre){
+                await newPoster.genres().attach(genre.split(","))
+            }
+            // newPoster.set("title", form.data.title)
+            // newPoster.set("cost", form.data.cost)
+            // newPoster.set("description", form.data.description)
+            // newPoster.set("date", form.data.date)
+            // newPoster.set("stock", form.data.stock)
+            // newPoster.set("height", form.data.height)
+            // newPoster.set("width", form.data.width)
+            // await newPoster.save();
 
             req.flash("success_msg", "New poster has been added")
             res.redirect("/posters")

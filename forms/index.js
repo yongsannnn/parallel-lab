@@ -26,7 +26,7 @@ var bootstrapField = function (name, object) {
 };
 
 
-const createPosterForm = () => {
+const createPosterForm = (genres) => {
     return forms.create({
         "title": fields.string({
             required: true,
@@ -81,7 +81,16 @@ const createPosterForm = () => {
                 label: ["form-label"]
             },
             validators:[validators.integer()]
+        }),
+        "genre": fields.string({
+            label:"Genre",
+            required:true,
+            errorAfterField: true,
+            cssClass:["form-label"],
+            widget:widget.multipleSelect(),
+            choices:genres
         })
+
     })
 }
 
