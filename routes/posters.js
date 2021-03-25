@@ -10,7 +10,9 @@ const { createPosterForm, bootstrapField } = require("../forms")
 
 // READ
 router.get("/", async (req, res) => {
-    let posters = await Poster.collection().fetch();
+    let posters = await Poster.collection().fetch({
+        withRelated: ["genres"]
+    });
     res.render("posters/index", {
         "posters": posters.toJSON()
     })
@@ -66,16 +68,20 @@ router.post("/create", async (req, res) => {
 
 // UPDATE
 router.get("/:poster_id/update", async (req, res) => {
+    const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
+    
     // Get the poster that you want to update
     const posterToUpdate = await Poster.where({
         "id": req.params.poster_id
     }).fetch({
-        required: true
+        require: true,
+        withRelated: ["genres"]
     })
 
     const posterJSON = posterToUpdate.toJSON()
+    const selectedGenreIds = posterJSON.genres.map(g => g.id)
     // send the poster to the view
-    const form = createPosterForm();
+    const form = createPosterForm(allGenre);
     form.fields.title.value = posterToUpdate.get("title");
     form.fields.cost.value = posterToUpdate.get("cost");
     form.fields.description.value = posterToUpdate.get("description");
@@ -83,6 +89,7 @@ router.get("/:poster_id/update", async (req, res) => {
     form.fields.stock.value = posterToUpdate.get("stock");
     form.fields.height.value = posterToUpdate.get("height");
     form.fields.width.value = posterToUpdate.get("width");
+    form.fields.genre.value = selectedGenreIds
 
     res.render("posters/update", {
         "form": form.toHTML(bootstrapField),
@@ -95,16 +102,22 @@ router.post("/:poster_id/update", async (req, res) => {
     const posterToUpdate = await Poster.where({
         "id": req.params.poster_id
     }).fetch({
-        required: true
+        require: true,
+        withRelated:["genres"]
     })
 
     const posterJSON = posterToUpdate.toJSON()
+    const selectedPosterIds = posterJSON.genres.map(g => g.id)
     const posterForm = createPosterForm();
 
     posterForm.handle(req, {
         "success": async (form) => {
-            posterToUpdate.set(form.data)
+            let {genre, ...posterData} = form.data
+            posterToUpdate.set(posterData)
             posterToUpdate.save()
+            let newGenreId = genre.split(",")
+            posterToUpdate.genres().detach(selectedPosterIds)
+            posterToUpdate.genres().attach(newGenreId)
             req.flash("success_msg", "Poster has been updated")
             res.redirect("/posters")
         },
@@ -122,7 +135,7 @@ router.get("/:poster_id/delete", async (req, res) => {
     const posterToDelete = await Poster.where({
         "id": req.params.poster_id
     }).fetch({
-        required: true
+        require: true
     })
 
     res.render("posters/delete", {
@@ -134,7 +147,7 @@ router.post("/:poster_id/delete", async (req, res) => {
     const posterToDelete = await Poster.where({
         "id": req.params.poster_id
     }).fetch({
-        required: true
+        require: true
     })
     await posterToDelete.destroy();
     req.flash("success_msg", "Poster has been deleted")
