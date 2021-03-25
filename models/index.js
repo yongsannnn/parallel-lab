@@ -14,6 +14,11 @@ const Genres = bookshelf.model("Genres",{
         return this.belongsToMany("Poster")
     }
 })
+
+const User = bookshelf.model("User",{
+    tableName: "users"
+})
+
 module.exports = {
-    Poster, Genres
+    Poster, Genres, User
 }

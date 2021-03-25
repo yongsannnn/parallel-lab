@@ -47,9 +47,13 @@ app.use(function(req,res,next){
 //importing the routes
 const homeRoutes = require("./routes/home")
 const posterRoutes = require("./routes/posters")
+const userRoutes = require("./routes/users")
+
+
 async function main() {
   app.use("/",homeRoutes)
   app.use("/posters",posterRoutes)
+  app.use("/users", userRoutes)
 }
 
 main();
