@@ -43,6 +43,11 @@ app.use(function(req,res,next){
     next()
 })
 
+//Global middleware to inject the req.session.use object into the local variable, which are accessible by hbs_files
+app.use(function(req,res,next){
+    res.locals.user = req.session.user;
+    next()
+})
 
 //importing the routes
 const homeRoutes = require("./routes/home")

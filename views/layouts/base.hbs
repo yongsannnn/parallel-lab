@@ -11,6 +11,16 @@
     <title>{{#block "title"}}{{/block}}</title>
   </head>
   <body>
+       <div class="mt-3 mb-3">
+        {{#if user}}
+        Welcome, {{user.username}}
+        <a href="/users/logout" class="ml-3 btn btn-primary btn-sm">Logout</a>
+        {{else}}
+        Welcome. 
+        <a href="/users/login" class="ml-3 btn btn-primary btn-sm">Login</a>
+        <a href="/users/register" class="ml-3 btn btn-primary btn-sm">Register</a>
+        {{/if}}
+    </div>
       {{#if success_msg}}
         {{#each success_msg}}
             <div class="alert alert-success">{{this}}</div>
