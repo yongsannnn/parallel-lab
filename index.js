@@ -53,12 +53,13 @@ app.use(function(req,res,next){
 const homeRoutes = require("./routes/home")
 const posterRoutes = require("./routes/posters")
 const userRoutes = require("./routes/users")
-
+const cloudinaryRoute = require("./routes/cloudinary")
 
 async function main() {
   app.use("/",homeRoutes)
   app.use("/posters",posterRoutes)
   app.use("/users", userRoutes)
+  app.use("/cloudinary", cloudinaryRoute)
 }
 
 main();

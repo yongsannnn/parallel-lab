@@ -89,6 +89,11 @@ const createPosterForm = (genres) => {
             cssClass:["form-label"],
             widget:widget.multipleSelect(),
             choices:genres
+        }),
+        "image_url": fields.string({
+            required:true,
+            errorAfterField: true,
+            widget:widget.hidden()
         })
 
     })

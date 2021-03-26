@@ -24,18 +24,21 @@ router.get("/", async (req, res) => {
 
 // CREATE
 // GET
-router.get("/create", checkIfAuthenticated, async(req, res) => {
+router.get("/create", async(req, res) => {
     //display all genres
     const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
 
     const posterForm = createPosterForm(allGenre);
     res.render("posters/create", {
-        "form": posterForm.toHTML(bootstrapField)
+        "form": posterForm.toHTML(bootstrapField),
+        "cloudinaryName": process.env.CLOUDINARY_NAME,
+        "cloudinaryApiKey": process.env.CLOUDINARY_API_KEY,
+        "cloudinaryPreset": process.env.CLOUDINARY_UPLOAD_PRESET
     })
 })
 
 // POST
-router.post("/create", checkIfAuthenticated, async (req, res) => {
+router.post("/create", async (req, res) => {
     const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
     
     const posterForm = createPosterForm(allGenre);

@@ -30,6 +30,9 @@
                 Genre
             </th>
             <th>
+                Images
+            </th>
+            <th>
 
             </th>
         </tr>
@@ -48,6 +51,11 @@
                     {{#each this.genres}}
                 <span class="badge badge-pill badge-primary">{{this.name}}</span>
                 {{/each}}
+                </td>
+                <td>
+                    {{#if this.image_url}}
+                        <img class="img-fliud" src="{{this.image_url}}"/>
+                    {{/if}}
                 </td>
                 <td>
                     <a href="/posters/{{this.id}}/update" class="btn-sm btn-primary">Update</a>
