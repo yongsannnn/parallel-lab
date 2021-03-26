@@ -6,27 +6,90 @@ const router = express.Router()
 const { Poster, Genres } = require("../models")
 
 // Import forms
-const { createPosterForm, bootstrapField } = require("../forms")
+const { createPosterForm, bootstrapField, createPosterSearchForm } = require("../forms")
 
 //import in checkIfAuthenticated middleware
 const { checkIfAuthenticated } = require("../middleware")
 
 // READ
 router.get("/", async (req, res) => {
-    let posters = await Poster.collection().fetch({
-        withRelated: ["genres"]
-    });
-    res.render("posters/index", {
-        "posters": posters.toJSON()
+    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
+    const searchForm = createPosterSearchForm(allGenre)
+    let q = Poster.collection();
+
+    searchForm.handle(req, {
+        "empty": async (form) => {
+            let posters = await q.fetch({
+                withRelated: ["genres"]
+            });
+            res.render("posters/index", {
+                "posters": posters.toJSON(),
+                "form": form.toHTML(bootstrapField)
+            })
+        },
+        "error": async (form) => {
+            let posters = await q.fetch({
+                withRelated: ["genres"]
+            });
+            res.render("posters/index", {
+                "posters": posters.toJSON(),
+                "form": form.toHTML(bootstrapField)
+            })
+        },
+        "success": async(form)=>{
+            if (form.data.title){
+                q = q.where("title","like", "%"+form.data.title+"%")
+            }
+            if (form.data.min_cost){
+                q = q.where("cost",">=", form.data.min_cost)
+            }
+
+            if (form.data.max_cost){
+                q = q.where("cost","<=", form.data.max_cost)
+            }
+
+            if (form.data.min_stock){
+                q = q.where("stock",">=", form.data.min_stock)
+            }
+
+            if (form.data.min_height){
+                q = q.where("height",">=", form.data.min_height)
+            }
+
+            if (form.data.max_height){
+                q = q.where("height","<=", form.data.max_height)
+            }
+
+            if (form.data.min_width){
+                q = q.where("width",">=", form.data.min_width)
+            }
+
+            if (form.data.max_width){
+                q = q.where("width","<=", form.data.max_width)
+            }
+
+            if (form.data.genre){
+                q = q.query("join","posters_genre","posters.id","poster_id").where("genre_id","in",form.data.genre.split(","))
+            }
+
+            let posters = await q.fetch({
+                withRelated: ["genres"]
+            });
+            res.render("posters/index", {
+                "posters": posters.toJSON(),
+                "form": form.toHTML(bootstrapField)
+            })
+        }
     })
+
 })
 
 
 // CREATE
 // GET
-router.get("/create",checkIfAuthenticated, async(req, res) => {
+router.get("/create", checkIfAuthenticated, async (req, res) => {
     //display all genres
-    const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
+    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
 
     const posterForm = createPosterForm(allGenre);
     res.render("posters/create", {
@@ -38,17 +101,17 @@ router.get("/create",checkIfAuthenticated, async(req, res) => {
 })
 
 // POST
-router.post("/create",checkIfAuthenticated, async (req, res) => {
-    const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
-    
+router.post("/create", checkIfAuthenticated, async (req, res) => {
+    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
+
     const posterForm = createPosterForm(allGenre);
     posterForm.handle(req, {
         "success": async (form) => {
-            let {genre,...posterData} = form.data;
+            let { genre, ...posterData } = form.data;
             const newPoster = new Poster();
             newPoster.set(posterData);
             await newPoster.save();
-            if (genre){
+            if (genre) {
                 await newPoster.genres().attach(genre.split(","))
             }
             // newPoster.set("title", form.data.title)
@@ -74,8 +137,8 @@ router.post("/create",checkIfAuthenticated, async (req, res) => {
 
 // UPDATE
 router.get("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
-    const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
-    
+    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
+
     // Get the poster that you want to update
     const posterToUpdate = await Poster.where({
         "id": req.params.poster_id
@@ -106,13 +169,13 @@ router.get("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
     })
 })
 
-router.post("/:poster_id/update",checkIfAuthenticated, async (req, res) => {
+router.post("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
     // Get the poster that you want to update
     const posterToUpdate = await Poster.where({
         "id": req.params.poster_id
     }).fetch({
         require: true,
-        withRelated:["genres"]
+        withRelated: ["genres"]
     })
 
     const posterJSON = posterToUpdate.toJSON()
@@ -121,7 +184,7 @@ router.post("/:poster_id/update",checkIfAuthenticated, async (req, res) => {
 
     posterForm.handle(req, {
         "success": async (form) => {
-            let {genre, ...posterData} = form.data
+            let { genre, ...posterData } = form.data
             posterToUpdate.set(posterData)
             posterToUpdate.save()
             let newGenreId = genre.split(",")

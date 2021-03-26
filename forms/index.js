@@ -154,4 +154,81 @@ const createLoginForm = () => {
     })
 }
 
-module.exports={createPosterForm,bootstrapField,createUserForm,createLoginForm}
+const createPosterSearchForm = (genres) => {
+    return forms.create({
+        "title": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            }
+        }),
+        "min_cost": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            },
+            validators:[validators.integer()]
+        }),
+        "max_cost": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            },
+            validators:[validators.integer()]
+        }),
+        
+        "min_stock": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            },
+            validators:[validators.integer()]
+        }),
+        "min_height": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            },
+            validators:[validators.integer()]
+        }),
+        "max_height": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            },
+            validators:[validators.integer()]
+        }),
+        "min_width": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            },
+            validators:[validators.integer()]
+        }),
+        "max_width": fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass:{
+                label: ["form-label"]
+            },
+            validators:[validators.integer()]
+        }),
+        "genre": fields.string({
+            label:"Genre",
+            required:false,
+            errorAfterField: true,
+            cssClass:["form-label"],
+            widget:widget.multipleSelect(),
+            choices:genres
+        }),
+    })
+}
+
+module.exports={createPosterForm,bootstrapField,createUserForm,createLoginForm,createPosterSearchForm}
