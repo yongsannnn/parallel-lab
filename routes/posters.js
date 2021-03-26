@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
 
 // CREATE
 // GET
-router.get("/create", async(req, res) => {
+router.get("/create",checkIfAuthenticated, async(req, res) => {
     //display all genres
     const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
 
@@ -38,7 +38,7 @@ router.get("/create", async(req, res) => {
 })
 
 // POST
-router.post("/create", async (req, res) => {
+router.post("/create",checkIfAuthenticated, async (req, res) => {
     const allGenre = await Genres.fetchAll().map(genre=>[genre.get("id"),genre.get("name")])
     
     const posterForm = createPosterForm(allGenre);
@@ -99,11 +99,14 @@ router.get("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
 
     res.render("posters/update", {
         "form": form.toHTML(bootstrapField),
-        "poster": posterJSON
+        "poster": posterJSON,
+        "cloudinaryName": process.env.CLOUDINARY_NAME,
+        "cloudinaryApiKey": process.env.CLOUDINARY_API_KEY,
+        "cloudinaryPreset": process.env.CLOUDINARY_UPLOAD_PRESET
     })
 })
 
-router.post("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
+router.post("/:poster_id/update",checkIfAuthenticated, async (req, res) => {
     // Get the poster that you want to update
     const posterToUpdate = await Poster.where({
         "id": req.params.poster_id

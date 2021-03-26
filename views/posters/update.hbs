@@ -2,11 +2,64 @@
 
 {{#block "content"}}
 <h1>Update Poster {{poster.name}}</h1>
+
 <form method="POST">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
     {{{form}}}
-    <input type="submit" class= "btn btn-primary" value="Update">
+    <div>
+        <a href="#" class="btn btn-primary mt-3 mb-3" id="upload_widget">Upload</a>
+    </div>
+    <div>
+
+        {{#if poster.image_url}}
+        <img src="{{poster.image_url}}" id="uploaded_image" />
+        {{else}}
+        <img src="" style="display:none" id="uploaded_image" />
+        {{/if}}
+
+    </div>
+    <input type="submit" class= "btn btn-primary mt-3" value="Update">
 
 
 </form>
+{{/block}}
+{{#block "js"}}
+<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+    integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+    crossorigin="anonymous"></script>
+<script>
+    // Cloudinary calls to get a signature
+    async function generateSignature(callback, params_to_sign){
+        let response = await axios.get("/cloudinary/sign",{
+            "params": {
+                "params_to_sign": params_to_sign
+            }
+        })
+        // Informs Cloudinary what the signature is
+        callback(response.data)
+    }
+
+    const config={
+        "cloudName": "{{cloudinaryName}}",
+        "apiKey": "{{cloudinaryApiKey}}",
+        "uploadPreset": "{{cloudinaryPreset}}",
+        "uploadSignature": generateSignature
+    }
+
+    const uploadWidget = cloudinary.createUploadWidget(config, (error, result) => {
+        if (!error && result && result.event == "success") {
+            console.log("Upload is successful!")
+            console.log(result.info);
+            document.querySelector('#id_image_url').value = result.info.url;
+            document.querySelector('#uploaded_image').src = result.info.url;
+            document.querySelector('#uploaded_image').style.display = 'block';
+        }
+    })
+
+    document.querySelector("#upload_widget").addEventListener("click", () => {
+        uploadWidget.open();
+    })
+</script>
 {{/block}}
 {{/extends}}
