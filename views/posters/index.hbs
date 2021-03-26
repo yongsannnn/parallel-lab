@@ -3,7 +3,10 @@
 <h1>Posters List</h1> 
 <a href="/posters/create" class="btn btn-success mb-2">Create</a>
 
-<form method="GET">
+<a class="btn btn-primary mb-2" data-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false" aria-controls="collapseForm">
+    Search
+  </a>
+<form method="GET" id="collapseForm" class="collapse">
     {{{form}}}
     <input type="submit" class="btn btn-primary mb-2" value="Search"/>
 </form>
