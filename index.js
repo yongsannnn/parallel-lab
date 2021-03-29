@@ -27,7 +27,7 @@ app.use(
 
 // setup sessions - this should be before your routes
 app.use(session({
-    "secret": "nil",
+    "secret": process.env.SESSION_SECRET_KEY,
     "resave": false,
     "saveUninitialized": true
 }))
