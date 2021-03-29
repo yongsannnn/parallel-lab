@@ -19,6 +19,13 @@ const User = bookshelf.model("User",{
     tableName: "users"
 })
 
+const CartItem = bookshelf.model("CartItem", {
+    tableName: "cart_items",
+    posters(){
+        return this.belongsTo("Poster")
+    }
+})
+
 module.exports = {
-    Poster, Genres, User
+    Poster, Genres, User, CartItem
 }
