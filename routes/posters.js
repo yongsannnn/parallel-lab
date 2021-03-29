@@ -8,12 +8,15 @@ const { Poster, Genres } = require("../models")
 // Import forms
 const { createPosterForm, bootstrapField, createPosterSearchForm } = require("../forms")
 
+// Import DAL
+const posterDataLayer = require("../dal/posters")
+
 //import in checkIfAuthenticated middleware
 const { checkIfAuthenticated } = require("../middleware")
 
 // READ
 router.get("/", async (req, res) => {
-    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
+    const allGenre = await posterDataLayer.getAllGenres()
     const searchForm = createPosterSearchForm(allGenre)
     let q = Poster.collection();
 
@@ -36,40 +39,40 @@ router.get("/", async (req, res) => {
                 "form": form.toHTML(bootstrapField)
             })
         },
-        "success": async(form)=>{
-            if (form.data.title){
-                q = q.where("title","like", "%"+form.data.title+"%")
+        "success": async (form) => {
+            if (form.data.title) {
+                q = q.where("title", "like", "%" + form.data.title + "%")
             }
-            if (form.data.min_cost){
-                q = q.where("cost",">=", form.data.min_cost)
-            }
-
-            if (form.data.max_cost){
-                q = q.where("cost","<=", form.data.max_cost)
+            if (form.data.min_cost) {
+                q = q.where("cost", ">=", form.data.min_cost)
             }
 
-            if (form.data.min_stock){
-                q = q.where("stock",">=", form.data.min_stock)
+            if (form.data.max_cost) {
+                q = q.where("cost", "<=", form.data.max_cost)
             }
 
-            if (form.data.min_height){
-                q = q.where("height",">=", form.data.min_height)
+            if (form.data.min_stock) {
+                q = q.where("stock", ">=", form.data.min_stock)
             }
 
-            if (form.data.max_height){
-                q = q.where("height","<=", form.data.max_height)
+            if (form.data.min_height) {
+                q = q.where("height", ">=", form.data.min_height)
             }
 
-            if (form.data.min_width){
-                q = q.where("width",">=", form.data.min_width)
+            if (form.data.max_height) {
+                q = q.where("height", "<=", form.data.max_height)
             }
 
-            if (form.data.max_width){
-                q = q.where("width","<=", form.data.max_width)
+            if (form.data.min_width) {
+                q = q.where("width", ">=", form.data.min_width)
             }
 
-            if (form.data.genre){
-                q = q.query("join","posters_genre","posters.id","poster_id").where("genre_id","in",form.data.genre.split(","))
+            if (form.data.max_width) {
+                q = q.where("width", "<=", form.data.max_width)
+            }
+
+            if (form.data.genre) {
+                q = q.query("join", "posters_genre", "posters.id", "poster_id").where("genre_id", "in", form.data.genre.split(","))
             }
 
             let posters = await q.fetch({
@@ -89,8 +92,7 @@ router.get("/", async (req, res) => {
 // GET
 router.get("/create", checkIfAuthenticated, async (req, res) => {
     //display all genres
-    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
-
+    const allGenre = await posterDataLayer.getAllGenres()
     const posterForm = createPosterForm(allGenre);
     res.render("posters/create", {
         "form": posterForm.toHTML(bootstrapField),
@@ -102,8 +104,7 @@ router.get("/create", checkIfAuthenticated, async (req, res) => {
 
 // POST
 router.post("/create", checkIfAuthenticated, async (req, res) => {
-    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
-
+    const allGenre = await posterDataLayer.getAllGenres()
     const posterForm = createPosterForm(allGenre);
     posterForm.handle(req, {
         "success": async (form) => {
@@ -137,15 +138,9 @@ router.post("/create", checkIfAuthenticated, async (req, res) => {
 
 // UPDATE
 router.get("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
-    const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
-
+    const allGenre = await posterDataLayer.getAllGenres()
     // Get the poster that you want to update
-    const posterToUpdate = await Poster.where({
-        "id": req.params.poster_id
-    }).fetch({
-        require: true,
-        withRelated: ["genres"]
-    })
+    const posterToUpdate = await posterDataLayer.getPosterById(req.params.poster_id)
 
     const posterJSON = posterToUpdate.toJSON()
     const selectedGenreIds = posterJSON.genres.map(g => g.id)
@@ -171,13 +166,7 @@ router.get("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
 
 router.post("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
     // Get the poster that you want to update
-    const posterToUpdate = await Poster.where({
-        "id": req.params.poster_id
-    }).fetch({
-        require: true,
-        withRelated: ["genres"]
-    })
-
+    const posterToUpdate = await posterDataLayer.getPosterById(req.params.poster_id)
     const posterJSON = posterToUpdate.toJSON()
     const selectedPosterIds = posterJSON.genres.map(g => g.id)
     const posterForm = createPosterForm();
@@ -204,11 +193,7 @@ router.post("/:poster_id/update", checkIfAuthenticated, async (req, res) => {
 
 // DELETE
 router.get("/:poster_id/delete", checkIfAuthenticated, async (req, res) => {
-    const posterToDelete = await Poster.where({
-        "id": req.params.poster_id
-    }).fetch({
-        require: true
-    })
+    const posterToDelete = await posterDataLayer.getPosterById(req.params.poster_id)
 
     res.render("posters/delete", {
         "poster": posterToDelete.toJSON()
@@ -216,11 +201,7 @@ router.get("/:poster_id/delete", checkIfAuthenticated, async (req, res) => {
 })
 
 router.post("/:poster_id/delete", checkIfAuthenticated, async (req, res) => {
-    const posterToDelete = await Poster.where({
-        "id": req.params.poster_id
-    }).fetch({
-        require: true
-    })
+    const posterToDelete = await posterDataLayer.getPosterById(req.params.poster_id)
     await posterToDelete.destroy();
     req.flash("success_msg", "Poster has been deleted")
     res.redirect("/posters")
