@@ -1,5 +1,9 @@
 const { Poster, Genres } = require("../models")
 
+const getAllPosters = async() => {
+    return await Poster.fetchAll()
+}
+
 const getAllGenres = async () => {
     const allGenre = await Genres.fetchAll().map(genre => [genre.get("id"), genre.get("name")])
     return allGenre
@@ -16,5 +20,5 @@ const getPosterById = async (posterId) => {
 }
 
 module.exports = {
-    getAllGenres, getPosterById
+    getAllGenres, getPosterById, getAllPosters
 }

@@ -45,7 +45,7 @@ app.use(function (req, res, next) {
         return next();
     }
     csurfInstance(req, res, next);
-}) 
+})
 
 app.use(function (err, req, res, next) {
     console.log(err)
@@ -85,7 +85,10 @@ const cloudinaryRoute = require("./routes/cloudinary")
 const shoppingCartRoute = require("./routes/shoppingCart")
 const checkoutRoute = require("./routes/checkout")
 
-
+//import api
+const api = {
+    "posters": require("./routes/api/posters")
+}
 async function main() {
     app.use("/", homeRoutes)
     app.use("/posters", posterRoutes)
@@ -93,6 +96,7 @@ async function main() {
     app.use("/cloudinary", cloudinaryRoute)
     app.use("/cart", shoppingCartRoute)
     app.use("/checkout", checkoutRoute)
+    app.use("/api/posters", api.posters)
 
 }
 
