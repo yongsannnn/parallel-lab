@@ -41,7 +41,7 @@ app.use(flash())
 const csurfInstance = csurf();
 app.use(function (req, res, next) {
     // console.log(req.url)
-    if (req.url === "/checkout/process_payment") {
+    if (req.url === "/checkout/process_payment" || req.url.slice(0, 5) == "/api/") {
         return next();
     }
     csurfInstance(req, res, next);
@@ -96,7 +96,7 @@ async function main() {
     app.use("/cloudinary", cloudinaryRoute)
     app.use("/cart", shoppingCartRoute)
     app.use("/checkout", checkoutRoute)
-    app.use("/api/posters", api.posters)
+    app.use("/api/posters", express.json(), api.posters)
 
 }
 
