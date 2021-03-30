@@ -1,6 +1,6 @@
-const {CartItem} = require("../models")
+const { CartItem } = require("../models")
 
-const getAllItems = async (userId)=>{
+const getAllItems = async (userId) => {
     return await CartItem.collection().where({
         "user_id": userId
     }).fetch({
@@ -11,11 +11,11 @@ const getAllItems = async (userId)=>{
 
 const getCartItemByUserAndPoster = async (userId, posterId) => {
     const cartItem = await CartItem.where({
-            "user_id": userId,
-            "poster_id": posterId
-        }).fetch({
-            require: false,
-        })
+        "user_id": userId,
+        "poster_id": posterId
+    }).fetch({
+        require: false,
+    })
     return cartItem
 }
 
@@ -28,7 +28,7 @@ const removeItem = async (userId, posterId) => {
     return false;
 }
 
-const updateQuantity = async(userId, posterId, newQuantity) => {
+const updateQuantity = async (userId, posterId, newQuantity) => {
     const item = await getCartItemByUserAndPoster(userId, posterId);
     if (item) {
         item.set("quantity", newQuantity);
@@ -40,5 +40,5 @@ const updateQuantity = async(userId, posterId, newQuantity) => {
 }
 
 module.exports = {
-    getCartItemByUserAndPoster,getAllItems,removeItem,updateQuantity
+    getCartItemByUserAndPoster, getAllItems, removeItem, updateQuantity
 }

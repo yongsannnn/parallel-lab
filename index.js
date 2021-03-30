@@ -20,9 +20,9 @@ wax.setLayoutPath("./views/layouts");
 
 // enable forms
 app.use(
-  express.urlencoded({
-    extended: false
-  })
+    express.urlencoded({
+        extended: false
+    })
 );
 
 // setup sessions - this should be before your routes
@@ -37,14 +37,14 @@ app.use(flash())
 
 
 // Setup middleware
-app.use(function(req,res,next){
+app.use(function (req, res, next) {
     res.locals.success_msg = req.flash("success_msg")
     res.locals.error_msg = req.flash("error_msg")
     next()
 })
 
 //Global middleware to inject the req.session.use object into the local variable, which are accessible by hbs_files
-app.use(function(req,res,next){
+app.use(function (req, res, next) {
     res.locals.user = req.session.user;
     next()
 })
@@ -57,15 +57,15 @@ const cloudinaryRoute = require("./routes/cloudinary")
 const shoppingCartRoute = require("./routes/shoppingCart")
 
 async function main() {
-  app.use("/",homeRoutes)
-  app.use("/posters",posterRoutes)
-  app.use("/users", userRoutes)
-  app.use("/cloudinary", cloudinaryRoute)
-  app.use("/shoppingCart", shoppingCartRoute)
+    app.use("/", homeRoutes)
+    app.use("/posters", posterRoutes)
+    app.use("/users", userRoutes)
+    app.use("/cloudinary", cloudinaryRoute)
+    app.use("/cart", shoppingCartRoute)
 }
 
 main();
 
 app.listen(3000, () => {
-  console.log("Server has started");
+    console.log("Server has started");
 });

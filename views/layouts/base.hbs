@@ -30,7 +30,7 @@
         {{#if user}}
         <div class="ml-auto">
             Welcome, {{user.username}}
-            <a href="/shoppingCart" class="ml-3 btn btn-success btn-sm">Cart</a>
+            <a href="/cart" class="ml-3 btn btn-success btn-sm">Cart</a>
             <a href="/users/logout" class="ml-3 btn btn-primary btn-sm">Logout</a>
         </div>
         {{else}}
@@ -40,8 +40,8 @@
         </div>
         {{/if}}
     </nav>
-   
-    
+
+
     <section class="container">
         {{#block "content"}}
         {{/block}}
