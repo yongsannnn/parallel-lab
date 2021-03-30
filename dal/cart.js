@@ -9,18 +9,18 @@ const getAllItems = async (userId)=>{
     })
 }
 
-const getCartItemByUserAndProduct = async (userId, productId) => {
+const getCartItemByUserAndPoster = async (userId, posterId) => {
     const cartItem = await CartItem.where({
             "user_id": userId,
-            "poster_id": productId
+            "poster_id": posterId
         }).fetch({
             require: false,
         })
     return cartItem
 }
 
-const removeItem = async (userId, productId) => {
-    const item = await getCartItemByUserAndProduct(userId, productId);
+const removeItem = async (userId, posterId) => {
+    const item = await getCartItemByUserAndPoster(userId, posterId);
     if (item) {
         item.destroy();
         return true;
@@ -28,8 +28,8 @@ const removeItem = async (userId, productId) => {
     return false;
 }
 
-const updateQuantity = async(userId, productId, newQuantity) => {
-    const item = await getCartItemByUserAndProduct(userId, productId);
+const updateQuantity = async(userId, posterId, newQuantity) => {
+    const item = await getCartItemByUserAndPoster(userId, posterId);
     if (item) {
         item.set("quantity", newQuantity);
         item.save();
@@ -40,5 +40,5 @@ const updateQuantity = async(userId, productId, newQuantity) => {
 }
 
 module.exports = {
-    getCartItemByUserAndProduct,getAllItems,removeItem,updateQuantity
+    getCartItemByUserAndPoster,getAllItems,removeItem,updateQuantity
 }

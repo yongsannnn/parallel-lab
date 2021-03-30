@@ -11,13 +11,13 @@ class CartServices {
         return allItems
     }
 
-    async addToCart(productId){
+    async addToCart(posterId){
         // Check if item is already in cart
-        const cartItem = await cartDataLayer.getCartItemByUserAndProduct(this.user_id, productId)
+        const cartItem = await cartDataLayer.getCartItemByUserAndPoster(this.user_id, posterId)
         // If false, create and save to the cart
         if (!cartItem) {
             let newCartItem = new CartItem();
-            newCartItem.set("poster_id", productId)
+            newCartItem.set("poster_id", posterId)
             newCartItem.set("user_id", this.user_id)
             newCartItem.set("quantity", 1)
             await newCartItem.save()
@@ -29,6 +29,10 @@ class CartServices {
             await cartItem.save()
             return cartItem
         }
+    }
+
+    async updateQuantity(posterId, newQuantity){
+        return await cartDataLayer.updateQuantity(this.user_id,posterId,newQuantity)
     }
 }
 
