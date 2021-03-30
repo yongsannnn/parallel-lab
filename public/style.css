@@ -1,0 +1,11 @@
+.cart-header{
+    display: flex !important;  
+}
+
+.checkout-btn{
+    height:35px;
+}
+
+.individual-item{
+    display: flex !important;
+}
